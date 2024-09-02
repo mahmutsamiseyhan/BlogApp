@@ -29,42 +29,38 @@ exports.post_register = async function(req, res, next) {
     const { name, email, password, role } = req.body; 
 
     try {
-        // Kullanıcı zaten var mı kontrol et
+        // Kullanıcının zaten var olup olmadığını kontrol et
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             req.session.message = { text: "Bu e-posta adresi zaten kayıtlı.", class: "danger" };
-            return res.redirect(`${BASE_URL}/account/register`);
+            return res.redirect("register");
         }
 
         // Yeni kullanıcı oluştur
         const newUser = new User({
             fullname: name,
             email: email,
-            password: password
+            password: password // password hash'lenmiş olacak
         });
 
         // Rolü bul ve kullanıcıya ata
         const userRole = await Role.findOne({ rolename: role });
         if (userRole) {
             newUser.roles.push(userRole._id);
-            await newUser.save(); 
+            await newUser.save();
         } else {
             req.session.message = { text: "Seçilen rol bulunamadı.", class: "danger" };
-            return res.redirect(`${BASE_URL}/account/register`);
+            return res.redirect("register");
         }
 
-        emailService.sendMail({
-            from: config.email.from, 
-            to: newUser.email,
-            subject: "Hesabınız oluşturuldu.",
-            text: "Hesabınız başarılı şekilde oluşturuldu."
-        });
+        // Kullanıcıya e-posta gönder
+        await sendMail(newUser.email, "Hesabınız oluşturuldu.", "Hesabınız başarılı şekilde oluşturuldu.");
 
         req.session.message = { text: "Hesabınıza giriş yapabilirsiniz", class: "success" };
-        return res.redirect(`${BASE_URL}/account/login`);
+        return res.redirect("login");
     } catch (err) {
         console.log("Kayıt işlemi sırasında hata oluştu:", err);
-        if (err.name == "ValidationError") {
+        if (err.name === "ValidationError") {
             let msg = "";
             for (let e in err.errors) {
                 msg += err.errors[e].message + " ";
