@@ -128,9 +128,9 @@ exports.post_login = async function(req, res, next) {
 
         // Yönlendirme için hedef URL'yi ayarla
         if (req.session.roles.includes("admin")) {
-            return res.redirect(`${BASE_URL}/blogs`);
+            return res.redirect(`${BASE_URL}/admin/blogs`);
         } else if (req.session.roles.includes("moderator")) {
-            return res.redirect(`${BASE_URL}/blogs`);
+            return res.redirect(`${BASE_URL}/admin/blogs`);
         } else if (req.session.roles.includes("guest")) {
             return res.redirect(`${BASE_URL}/blogs`);
         } else {

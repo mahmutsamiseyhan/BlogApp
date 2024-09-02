@@ -67,11 +67,13 @@ app.use("/static", express.static(path.join(__dirname, "public")));
 
 // Global değişkenler middleware
 app.use((req, res, next) => {
-    res.locals.isAuth = req.isAuthenticated ? req.isAuthenticated() : false;
-    res.locals.isAdmin = req.user && req.user.roles && req.user.roles.includes('admin');
-    res.locals.isModerator = req.user && req.user.roles && req.user.roles.includes('moderator');
+    res.locals.isAuth = req.session.isAuth || false;
+    res.locals.isAdmin = req.session.roles && req.session.roles.includes('admin');
+    res.locals.isModerator = req.session.roles && req.session.roles.includes('moderator');
+    res.locals.fullname = req.session.fullname || '';
     next();
 });
+
 
 // CSRF koruması için middleware'i ekle
 app.use(csurf({ cookie: true }));  // CSRF token'ını çerezde depolamak için
