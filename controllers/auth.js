@@ -54,8 +54,8 @@ exports.post_register = async function(req, res, next) {
         }
 
         emailService.sendMail({
-            from: config.email.from,
-            to: newUser.email,
+            from: process.env.EMAIL_USER, // emailService.sendMail fonksiyonu ile e-posta gönderir
+            to: newUser.email,  // emailService.sendMail fonksiyonu ile e-posta gönderir
             subject: "Hesabınız oluşturuldu.",
             text: "Hesabınız başarılı şekilde oluşturuldu."
         });
@@ -128,9 +128,9 @@ exports.post_login = async function(req, res, next) {
 
         // Yönlendirme için hedef URL'yi ayarla
         if (req.session.roles.includes("admin")) {
-            return res.redirect(`${BASE_URL}/admin/blogs`);
+            return res.redirect(`${BASE_URL}/blogs`);
         } else if (req.session.roles.includes("moderator")) {
-            return res.redirect(`${BASE_URL}/admin/blogs`);
+            return res.redirect(`${BASE_URL}/blogs`);
         } else if (req.session.roles.includes("guest")) {
             return res.redirect(`${BASE_URL}/blogs`);
         } else {
