@@ -26,48 +26,54 @@ exports.get_register = async function(req, res, next) {
 
 // Kullanıcı kayıt işlemini gerçekleştirir
 exports.post_register = async function(req, res, next) {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role } = req.body; 
 
     try {
-        // Kullanıcı zaten var mı kontrol et
+        // Kullanıcının zaten var olup olmadığını kontrol et
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             req.session.message = { text: "Bu e-posta adresi zaten kayıtlı.", class: "danger" };
-            return res.redirect(`${BASE_URL}/account/register`);
+            return res.redirect("register");
         }
 
         // Yeni kullanıcı oluştur
         const newUser = new User({
             fullname: name,
             email: email,
-            password: password
+            password: password // password hash'lenmiş olacak
         });
 
         // Rolü bul ve kullanıcıya ata
         const userRole = await Role.findOne({ rolename: role });
         if (userRole) {
             newUser.roles.push(userRole._id);
-            await newUser.save(); 
-
-            // Hoş geldiniz e-postası gönder
-            await sendMail(
-                newUser.email,
-                "Hesabınız Oluşturuldu",
-                "Hoş geldiniz! Hesabınız başarıyla oluşturuldu."
-            );
+            await newUser.save();
         } else {
             req.session.message = { text: "Seçilen rol bulunamadı.", class: "danger" };
-            return res.redirect(`${BASE_URL}/account/register`);
+            return res.redirect("register");
         }
 
+        // Kullanıcıya e-posta gönder
+        await sendMail(newUser.email, "Hesabınız oluşturuldu.", "Hesabınız başarılı şekilde oluşturuldu.");
+
         req.session.message = { text: "Hesabınıza giriş yapabilirsiniz", class: "success" };
-        return res.redirect(`${BASE_URL}/account/login`);
+        return res.redirect("login");
     } catch (err) {
         console.log("Kayıt işlemi sırasında hata oluştu:", err);
-        next(err);
+        if (err.name === "ValidationError") {
+            let msg = "";
+            for (let e in err.errors) {
+                msg += err.errors[e].message + " ";
+            }
+            return res.render("auth/register", {
+                title: "register",
+                message: { text: msg, class: "danger" }
+            });
+        } else {
+            next(err);
+        }
     }
 };
-
 
 // Kullanıcı giriş sayfasını gösterir
 exports.get_login = async function(req, res, next) {
@@ -147,39 +153,38 @@ exports.get_reset = async function(req, res, next) {
     }
 }
 
-// Şifre sıfırlama işlemini gerçekleştirir
+// Parola sıfırlama işlemini gerçekleştirir
 exports.post_reset = async function(req, res, next) {
-    const email = req.body.email;
-
+    const email = req.body.email; // Formdan gelen e-posta
     try {
-        const user = await User.findOne({ email: email });
+        const user = await User.findOne({ email: email }); // Kullanıcıyı e-posta adresine göre bulur
         if (!user) {
-            req.session.message = { text: "E-posta adresi bulunamadı", class: "danger" };
+            req.session.message = { text: "Eposta bulunamadı", class: "danger" }; // Kullanıcı bulunamazsa hata mesajı
             return res.redirect(`${BASE_URL}/account/reset-password`);
         }
 
-        // Parola sıfırlama token'ı oluştur
+        // Şifre sıfırlama token'ı oluşturur
         const token = crypto.randomBytes(32).toString("hex");
-        user.resetToken = token;
-        user.resetTokenExpiration = Date.now() + 3600000; // Token 1 saat geçerli
+        user.resetToken = token; // Token'ı kullanıcının veritabanı kaydına ekler
+        user.resetTokenExpiration = Date.now() + 3600000; // Token'ın geçerlilik süresi 1 saat
         await user.save();
 
-        // Parola sıfırlama e-postası gönder
+        // Kullanıcıya şifre sıfırlama e-postası gönderir
         await sendMail(
             user.email,
             "Parola Sıfırlama",
             `Parolanızı sıfırlamak için aşağıdaki bağlantıya tıklayın: ${BASE_URL}/account/new-password/${token}`
         );
 
-        req.session.message = { text: "Parola sıfırlama bağlantısı e-posta adresinize gönderildi.", class: "success" };
+        // Kullanıcıya bilgilendirme mesajı gösterir ve giriş sayfasına yönlendirir
+        req.session.message = { text: "Parolanızı sıfırlamak için eposta adresinizi kontrol ediniz.", class: "success"};
         res.redirect(`${BASE_URL}/account/login`);
-    } catch (err) {
-        console.log("Parola sıfırlama işlemi sırasında hata oluştu:", err);
-        next(err);
+    }
+    catch(err) {
+        console.log(err); // Hata konsola yazdırılır
+        next(err); // Hata işleme
     }
 };
-
-
 
 // Yeni şifre belirleme sayfasını gösterir
 exports.get_newpassword = async function(req, res, next) {
@@ -210,7 +215,7 @@ exports.get_newpassword = async function(req, res, next) {
         console.log(err); // Hata konsola yazdırılır
         next(err); // Hata işleme
     }
-}
+};
 
 // Yeni şifre belirleme işlemini gerçekleştirir
 exports.post_newpassword = async function(req, res) {
@@ -247,7 +252,7 @@ exports.post_newpassword = async function(req, res) {
         console.log(err); // Hata konsola yazdırılır
         next(err); // Hata işleme
     }
-}
+};
 
 // Kullanıcı çıkış işlemini gerçekleştirir
 exports.get_logout = function(req, res) {
