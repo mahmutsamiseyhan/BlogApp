@@ -8,8 +8,8 @@ const jwt = require('jsonwebtoken'); // JSON Web Token oluşturma ve doğrulama
 const Role = require("../models/role"); // Rol modelini içe aktar
 
 // BASE_URL için ortam değişkeni ayarlanıyor
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-
+const BASE_URL = process.env.BASE_URL ;
+// || 'http://localhost:3000'
 // Kullanıcı kayıt sayfasını gösterir
 exports.get_register = async function(req, res, next) {
     try {
