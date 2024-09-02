@@ -1,5 +1,10 @@
 const express = require("express");
-const app = express();
+const app = express();  // 'app' nesnesi burada tanımlanıyor
+
+// Heroku gibi bir proxy arkasında çalışırken 'trust proxy' ayarını etkinleştirin
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1); // Heroku için güvenilir proxy ayarı
+}
 const methodOverride = require('method-override');
 const path = require("path");
 const cookieParser = require('cookie-parser');
@@ -95,20 +100,10 @@ app.use((err, req, res, next) => {
 mongoose.connection.once('open', () => {
     console.log('MongoDB Atlas bağlantısı başarılı.');
 
-  // Diğer middleware ve ayarlar
-
-// Ortam değişkenlerine göre ayarlama yapın
-if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1); // Heroku için güvenilir proxy ayarı
-} else {
-    // Geliştirme ortamı için herhangi bir özel ayar
-}
-
-// Sunucu başlatma
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+    // Sunucuyu başlat
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, function() {
+        console.log(`Server is running on port ${PORT}`);
 
         // Dummy verileri ekle
         populate().then(() => {
