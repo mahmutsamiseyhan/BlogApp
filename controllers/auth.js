@@ -6,6 +6,10 @@ const config = require("../config"); // Konfigürasyon dosyası
 const crypto = require("crypto"); // Kriptografik işlemler için kullanılıyor
 const jwt = require('jsonwebtoken'); // JSON Web Token oluşturma ve doğrulama
 const Role = require("../models/role"); // Rol modelini içe aktar
+
+// BASE_URL için ortam değişkeni ayarlanıyor
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+
 // Kullanıcı kayıt sayfasını gösterir
 exports.get_register = async function(req, res, next) {
     try {
@@ -29,7 +33,7 @@ exports.post_register = async function(req, res, next) {
         const existingUser = await User.findOne({ email: email });
         if (existingUser) {
             req.session.message = { text: "Bu e-posta adresi zaten kayıtlı.", class: "danger" };
-            return res.redirect("register");
+            return res.redirect(`${BASE_URL}/account/register`);
         }
 
         // Yeni kullanıcı oluştur
@@ -46,7 +50,7 @@ exports.post_register = async function(req, res, next) {
             await newUser.save(); 
         } else {
             req.session.message = { text: "Seçilen rol bulunamadı.", class: "danger" };
-            return res.redirect("register");
+            return res.redirect(`${BASE_URL}/account/register`);
         }
 
         emailService.sendMail({
@@ -57,7 +61,7 @@ exports.post_register = async function(req, res, next) {
         });
 
         req.session.message = { text: "Hesabınıza giriş yapabilirsiniz", class: "success" };
-        return res.redirect("login");
+        return res.redirect(`${BASE_URL}/account/login`);
     } catch (err) {
         console.log("Kayıt işlemi sırasında hata oluştu:", err);
         if (err.name == "ValidationError") {
@@ -75,7 +79,6 @@ exports.post_register = async function(req, res, next) {
     }
 };
 
-
 // Kullanıcı giriş sayfasını gösterir
 exports.get_login = async function(req, res, next) {
     const message = req.session.message; // Oturumdan mesaj alır
@@ -91,6 +94,7 @@ exports.get_login = async function(req, res, next) {
         next(err); // Hata işleme
     }
 }
+
 // Kullanıcı giriş işlemini gerçekleştirir
 exports.post_login = async function(req, res, next) {
     const { email, password } = req.body; // Giriş formundan gelen veriler
@@ -123,16 +127,15 @@ exports.post_login = async function(req, res, next) {
         req.session.userid = user.id;
 
         // Yönlendirme için hedef URL'yi ayarla
-         // Kullanıcının rolüne göre yönlendirme yap
-         if (req.session.roles.includes("admin")) {
-            return res.redirect("http://localhost:3000/blogs");
+        if (req.session.roles.includes("admin")) {
+            return res.redirect(`${BASE_URL}/blogs`);
         } else if (req.session.roles.includes("moderator")) {
-            return res.redirect("http://localhost:3000/blogs");
+            return res.redirect(`${BASE_URL}/blogs`);
         } else if (req.session.roles.includes("guest")) {
-            return res.redirect("http://localhost:3000/blogs");
+            return res.redirect(`${BASE_URL}/blogs`);
         } else {
             // Varsayılan yönlendirme (örneğin, ana sayfa)
-            return res.redirect("/");
+            return res.redirect(`${BASE_URL}/`);
         }
 
     } catch (err) {
@@ -140,7 +143,6 @@ exports.post_login = async function(req, res, next) {
         next(err);
     }
 };
-
 
 // Şifre sıfırlama sayfasını gösterir
 exports.get_reset = async function(req, res, next) {
@@ -162,7 +164,7 @@ exports.post_reset = async function(req, res, next) {
         const user = await User.findOne({ email: email }); // Kullanıcıyı e-posta adresine göre bulur
         if (!user) {
             req.session.message = { text: "Eposta bulunamadı", class: "danger" }; // Kullanıcı bulunamazsa hata mesajı
-            return res.redirect("reset-password");
+            return res.redirect(`${BASE_URL}/account/reset-password`);
         }
 
         // Şifre sıfırlama token'ı oluşturur
@@ -179,14 +181,14 @@ exports.post_reset = async function(req, res, next) {
             html: `
                 <p>Parolanızı güncellemek için aşağıdaki linke tıklayınız.</p>
                 <p>
-                    <a href="http://127.0.0.1:3000/account/new-password/${token}">Parola Sıfırla<a/>
+                    <a href="${BASE_URL}/account/new-password/${token}">Parola Sıfırla<a/>
                 </p>
             `
         });
 
         // Kullanıcıya bilgilendirme mesajı gösterir ve giriş sayfasına yönlendirir
         req.session.message = { text: "Parolanızı sıfırlamak için eposta adresinizi kontrol ediniz.", class: "success"};
-        res.redirect("login");
+        res.redirect(`${BASE_URL}/account/login`);
     }
     catch(err) {
         console.log(err); // Hata konsola yazdırılır
@@ -208,7 +210,7 @@ exports.get_newpassword = async function(req, res, next) {
         if (!user) {
             // Kullanıcı bulunamazsa hata mesajı gösterir ve yönlendirir
             req.session.message = { text: "Geçersiz veya süresi dolmuş token", class: "danger" };
-            return res.redirect("reset-password");
+            return res.redirect(`${BASE_URL}/account/reset-password`);
         }
 
         // Yeni şifre belirleme sayfasını render eder
@@ -242,7 +244,7 @@ exports.post_newpassword = async function(req, res) {
         if (!user) {
             // Kullanıcı bulunamazsa hata mesajı gösterir ve yönlendirir
             req.session.message = { text: "Geçersiz veya süresi dolmuş token", class: "danger" };
-            return res.redirect("reset-password");
+            return res.redirect(`${BASE_URL}/account/reset-password`);
         }
 
         // Yeni şifreyi hash'ler ve kullanıcı kaydını günceller
@@ -254,7 +256,7 @@ exports.post_newpassword = async function(req, res) {
 
         // Kullanıcıya başarı mesajı gösterir ve giriş sayfasına yönlendirir
         req.session.message = { text: "Parolanız güncellendi", class: "success" };
-        return res.redirect("login");
+        return res.redirect(`${BASE_URL}/account/login`);
     }
     catch(err) {
         console.log(err); // Hata konsola yazdırılır
@@ -267,8 +269,8 @@ exports.get_logout = function(req, res) {
     req.session.destroy((err) => {
         if (err) {
             console.log(err); // Hata konsola yazdırılır
-            return res.redirect("/"); // Hata durumunda ana sayfaya yönlendirilir
+            return res.redirect(`${BASE_URL}/`); // Hata durumunda ana sayfaya yönlendirilir
         }
-        res.redirect("/login"); // Oturum başarıyla sonlandırılırsa giriş sayfasına yönlendirilir
+        res.redirect(`${BASE_URL}/account/login`); // Oturum başarıyla sonlandırılırsa giriş sayfasına yönlendirilir
     });
 }
