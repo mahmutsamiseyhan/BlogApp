@@ -31,6 +31,7 @@ const errorHandling = require("./middlewares/error-handling");
 // EJS şablon motorunu ayarla
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));  // Views dizinini belirtmek için
+app.set('trust proxy', 1); // 1, en yaygın proxy seviyesini ifade eder.
 
 // URL-encoded ve JSON verilerini işle
 app.use(express.urlencoded({ extended: true }));
@@ -58,6 +59,7 @@ app.use(session({
 // Statik dosyaları servis et
 app.use("/libs", express.static(path.join(__dirname, "node_modules")));
 app.use("/static", express.static(path.join(__dirname, "public")));
+
 
 // Global değişkenler middleware
 app.use((req, res, next) => {
