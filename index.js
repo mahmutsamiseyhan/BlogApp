@@ -30,6 +30,7 @@ const errorHandling = require("./middlewares/error-handling");
 
 // EJS şablon motorunu ayarla
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));  // Views dizinini belirtmek için
 
 // URL-encoded ve JSON verilerini işle
 app.use(express.urlencoded({ extended: true }));
@@ -58,11 +59,6 @@ app.use(session({
 app.use("/libs", express.static(path.join(__dirname, "node_modules")));
 app.use("/static", express.static(path.join(__dirname, "public")));
 
-// Route'ları tanımla
-app.use("/admin", adminRoutes);
-app.use("/account", authRoutes);
-app.use("/", userRoutes);
-
 // Global değişkenler middleware
 app.use((req, res, next) => {
     res.locals.isAuth = req.isAuthenticated ? req.isAuthenticated() : false;
@@ -72,22 +68,27 @@ app.use((req, res, next) => {
 });
 
 // CSRF koruması için middleware'i ekle
-app.use(csurf());
+app.use(csurf({ cookie: true }));  // CSRF token'ını çerezde depolamak için
+
+// Route'ları tanımla
+app.use("/admin", adminRoutes);
+app.use("/account", authRoutes);
+app.use("/", userRoutes);
+
+// Log ve hata işleme orta katmanlarını ekle
+app.use(logMiddleware);
+app.use(errorHandling);
 
 // Tanımlanmamış URL'ler için 404 sayfası
 app.use("*", (req, res) => {
-    res.status(404).render("error/404", { title: "not found" });
+    res.status(404).render("error/404", { title: "Not Found" });
 });
 
 // Hata işleme middleware'i
 app.use((err, req, res, next) => {
     console.error('Hata:', err.message);
-    res.status(500).render('admin/error', { message: 'Bir hata oluştu' });
+    res.status(500).render('error/500', { message: 'Bir hata oluştu' }); // 'error/500' olarak değiştirildi
 });
-
-// Log ve hata işleme orta katmanlarını ekle
-app.use(logMiddleware);
-app.use(errorHandling);
 
 // MongoDB bağlantısı başarılı olduğunda
 mongoose.connection.once('open', () => {
