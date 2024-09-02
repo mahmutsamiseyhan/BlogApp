@@ -8,9 +8,9 @@ const config = {
         database: process.env.DB_DATABASE
     },
     email: {
-        username: process.env.EMAIL_USERNAME,
+        username: process.env.EMAIL_USER,
         password: process.env.EMAIL_PASSWORD,
-        from: process.env.EMAIL_USERNAME
+        from: process.env.EMAIL_USER
     },
     sessionSecret: process.env.SESSION_SECRET
 }
