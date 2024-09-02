@@ -1,7 +1,7 @@
 // Gerekli modüller ve yardımcı dosyalar dahil ediliyor
 const User = require("../models/user");
 const bcrypt = require("bcrypt"); // Şifreleme için kullanılıyor
-const emailService = require("../helpers/send-mail"); // E-posta gönderme fonksiyonu
+const sendMail = require("../helpers/send-mail"); // E-posta gönderme fonksiyonu
 const config = require("../config"); // Konfigürasyon dosyası
 const crypto = require("crypto"); // Kriptografik işlemler için kullanılıyor
 const jwt = require('jsonwebtoken'); // JSON Web Token oluşturma ve doğrulama
