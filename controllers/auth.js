@@ -170,17 +170,16 @@ exports.post_reset = async function(req, res, next) {
         await user.save();
 
         // Kullanıcıya şifre sıfırlama e-postası gönderir
-        emailService.sendMail({
-            from: config.email.from,
-            to: email,
-            subject: "Reset Password",
-            html: `
+        await sendMail(
+            email,
+            "Reset Password",
+            `
                 <p>Parolanızı güncellemek için aşağıdaki linke tıklayınız.</p>
                 <p>
                     <a href="${BASE_URL}/account/new-password/${token}">Parola Sıfırla<a/>
                 </p>
             `
-        });
+        );
 
         // Kullanıcıya bilgilendirme mesajı gösterir ve giriş sayfasına yönlendirir
         req.session.message = { text: "Parolanızı sıfırlamak için eposta adresinizi kontrol ediniz.", class: "success"};
@@ -191,6 +190,7 @@ exports.post_reset = async function(req, res, next) {
         next(err); // Hata işleme
     }
 }
+
 
 // Yeni şifre belirleme sayfasını gösterir
 exports.get_newpassword = async function(req, res, next) {
