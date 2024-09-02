@@ -54,8 +54,8 @@ exports.post_register = async function(req, res, next) {
         }
 
         emailService.sendMail({
-            from: process.env.EMAIL_USER, // emailService.sendMail fonksiyonu ile e-posta gönderir
-            to: newUser.email,  // emailService.sendMail fonksiyonu ile e-posta gönderir
+            from: config.email.from, 
+            to: newUser.email,
             subject: "Hesabınız oluşturuldu.",
             text: "Hesabınız başarılı şekilde oluşturuldu."
         });
