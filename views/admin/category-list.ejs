@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <%- include("../partials/head") %> 
+</head>
+<body>
+    
+    <%- include("../partials/nav") %> 
+
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-12 mt-3">
+                <!-- Aksiyonlar Sonrası Mesajlar -->
+                <% if (typeof action !== "undefined" && action === "edit") { %>
+                    <div class="alert alert-success">
+                        <%= categoryid %> ID numaralı kategori güncellendi.
+                    </div>
+                <% } %>
+                <% if (typeof action !== "undefined" && action === "create") { %>
+                    <div class="alert alert-success">
+                        Kategori eklendi.
+                    </div>
+                <% } %>
+                <% if (typeof action !== "undefined" && action === "delete") { %>
+                    <div class="alert alert-success">
+                        Kategori silindi.
+                    </div>
+                <% } %>
+
+                <!-- Kategori Tablosu -->
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th>Name</th>
+                            <th style="width: 130px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% categories.forEach(category => { %>
+                            <tr>
+                                <td>#<%= category._id %></td> <!-- MongoDB kullanıyorsanız _id kullanılır -->
+                                <td><%= category.name %></td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary" href="/admin/categories/<%= category._id %>">Edit</a>
+                                    <a class="btn btn-sm btn-danger" href="/admin/category/delete/<%= category._id %>">Delete</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <%- include("../partials/head") %>
+    <title>Kullanıcıyı Sil</title>
+</head>
+<body>
+    <%- include("../partials/nav") %> 
+
+    <div class="container mt-3">
+        <h1>Kullanıcıyı Sil</h1>
+        <p><strong><%= user.fullname %></strong> kullanıcısını silmek istediğinizden emin misiniz?</p>
+        <!-- Silme işlemi için form -->
+        <form action="/admin/user/delete" method="POST">
+            <input type="hidden" name="userId" value="<%= user._id %>"> <!-- Kullanıcı ID'si -->
+            <!-- CSRF Token -->
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="btn btn-danger">Sil</button>
+            <a href="/admin/users" class="btn btn-secondary">İptal</a>
+        </form>
+    </div>
+</body>
+</html>

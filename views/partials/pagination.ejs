@@ -1,0 +1,22 @@
+<% if (totalPages > 1) { %>
+    <nav class="mt-5">
+        <ul class="pagination justify-content-start">
+            <!-- İlk Sayfa Linki -->
+            <li class="page-item <%= currentPage === 0 ? "disabled" : "" %>">
+                <a href="?page=0" class="page-link">İlk Sayfa</a>
+            </li>
+
+            <!-- Sayfa Numaralandırması -->
+            <% for (let i = 0; i < totalPages; i++) { %>
+                <li class="page-item <%= i === currentPage ? "active" : "" %>">
+                    <a href="?page=<%= i %>" class="page-link"><%= i + 1 %></a>
+                </li>
+            <% } %>
+
+            <!-- Son Sayfa Linki -->
+            <li class="page-item <%= currentPage === totalPages - 1 ? "disabled" : "" %>">
+                <a href="?page=<%= totalPages - 1 %>" class="page-link">Son Sayfa</a>
+            </li>
+        </ul>
+    </nav>
+<% } %>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <%- include("../partials/head") %> 
+</head>
+<body>
+    
+    <%- include("../partials/nav") %> 
+
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-12 mt-3">
+                <div class="card card-body">
+                    <!-- Rol Düzenleme Formu -->
+                    <form method="post">
+                        <!-- CSRF Koruma -->
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <!-- Rol ID'si -->
+                        <input type="hidden" name="roleid" value="<%= role._id %>">
+                        
+                        <!-- Rol Adı Girişi -->
+                        <div class="row mb-3">
+                            <label for="rolename" class="col-sm-2 col-form-label">Name</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="rolename" name="rolename" value="<%= role.rolename %>">
+                            </div>
+                        </div>
+
+                        <!-- Kaydet Butonu -->
+                        <div class="row mb-3">
+                            <div class="col-sm-8 offset-sm-2">
+                                <button type="submit" class="btn btn-primary">Kaydet</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+              
+                <!-- Kullanıcılar Tablosu -->
+                <table class="table table-bordered table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th style="width: 150px;">Username</th>
+                            <th>Email</th>
+                            <th style="width: 200px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach(user => { %>
+                            <tr>
+                                <td>#<%= user._id %></td> <!-- MongoDB ile kullanıyorsanız _id kullanılır -->
+                                <td><%= user.fullname %></td>
+                                <td><%= user.email %></td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary" href="/admin/users/<%= user._id %>">Edit</a>
+                                    
+                                    <!-- Kullanıcıyı Rolden Çıkarma Formu -->
+                                    <form style="display: inline-block;" action="/admin/roles/remove" method="post">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="roleid" value="<%= role._id %>">
+                                        <input type="hidden" name="userid" value="<%= user._id %>">
+                                        <button class="btn btn-sm btn-danger" type="submit">Kategoriden Çıkar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+       
+</body>
+</html>

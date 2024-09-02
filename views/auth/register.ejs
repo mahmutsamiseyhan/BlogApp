@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <%- include("../partials/head") %> 
+</head>
+<body>
+    
+    <%- include("../partials/nav") %> 
+
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-12 mt-3">
+
+                <% if (typeof message != "undefined") { %>
+                    <div class="alert alert-<%= message.class %>">
+                        <%= message.text %> 
+                    </div>
+                <% } %>
+
+                <form action="/account/register" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    
+                    <!-- Kullanıcı Adı Girişi -->
+                    <div class="row mb-3">
+                        <label for="name" class="col-sm-2 col-form-label">İsim</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Girişi -->
+                    <div class="row mb-3">
+                        <label for="email" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Şifre Girişi -->
+                    <div class="row mb-3">
+                        <label for="password" class="col-sm-2 col-form-label">Şifre</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+
+                    <!-- Rol Seçimi -->
+                    <div class="row mb-3">
+                        <label for="role" class="col-sm-2 col-form-label">Rol</label>
+                        <div class="col-sm-10">
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="guest">Ziyaretçi</option>
+                                <option value="moderator">Moderator</option>
+                            </select>
+                        </div>
+                    </div>
+                   
+                    <!-- Kaydet Butonu -->
+                    <div class="row mb-3">
+                        <div class="col-sm-10 offset-sm-2">
+                          <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+  
+</body>
+</html>

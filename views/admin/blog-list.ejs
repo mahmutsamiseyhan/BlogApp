@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <%- include("../partials/head") %> 
+</head>
+<body>
+    
+    <%- include("../partials/nav") %> 
+
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-md-12 mt-3">
+                <!-- Aksiyon Sonrası Mesajlar -->
+                <% if (typeof action !== "undefined" && action === "edit") { %>
+                    <div class="alert alert-success">
+                        <%= blogid %> ID numaralı blog güncellendi.
+                    </div>
+                <% } %>
+                <% if (typeof action !== "undefined" && action === "create") { %>
+                    <div class="alert alert-success">
+                        Blog eklendi.
+                    </div>
+                <% } %>
+                <% if (typeof action !== "undefined" && action === "delete") { %>
+                    <div class="alert alert-success">
+                        Blog silindi.
+                    </div>
+                <% } %>
+
+                <!-- Bloglar Tablosu -->
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th style="width: 150px;">Resim</th>
+                            <th>Başlık</th>
+                            <th>Kategori</th>
+                            <th style="width: 130px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% blogs.forEach(blog => { %>
+                            <tr>
+                                <td>#<%= blog._id %></td> <!-- Blog'un ID'sine erişim -->
+                                <td>
+                                    <img src="/static/images/<%= blog.resim %>" class="img-fluid" alt="">
+                                </td>
+                                <td>
+                                    <%= blog.baslik %> <!-- Blog başlığına erişim -->
+                                </td>
+                                <td>
+                                    <% if (blog.categories && blog.categories.length) { %> <!-- Kategorilerin varlığını kontrol edin -->
+                                        <% blog.categories.forEach(category => { %>
+                                            <span><%= category.name %></span> <!-- Kategori adını göster -->
+                                        <% }) %>
+                                    <% } else { %>
+                                        <span>Belirtilmemiş</span> <!-- Kategori yoksa alternatif mesaj -->
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary" href="/admin/blogs/<%= blog._id %>">Edit</a>
+                                    <a class="btn btn-sm btn-danger" href="/admin/blog/delete/<%= blog._id %>">Delete</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

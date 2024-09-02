@@ -1,0 +1,66 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <!-- Minimalist Logo -->
+        <a href="/" class="navbar-brand">Blogapp</a>
+        
+        <!-- Menü Toggle Butonu (Mobil Görünüm İçin) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navbar İçeriği -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Navigasyon Linkleri -->
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a href="/blogs" class="nav-link">Tüm Bloglar</a>
+                </li>
+
+                <!-- Admin ve Moderator Erişimi -->
+                <% if (isAdmin || isModerator) { %>            
+                    <li class="nav-item">
+                        <a href="/admin/blogs" class="nav-link">Admin Bloglar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/blog/create" class="nav-link">Blog Ekle</a>
+                    </li>
+                <% } %>
+
+                <!-- Yalnızca Admin Erişimi -->
+                <% if (isAdmin) { %>
+                    <li class="nav-item">
+                        <a href="/admin/categories" class="nav-link">Admin Kategoriler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/category/create" class="nav-link">Kategori Ekle</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/roles" class="nav-link">Roller</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/users" class="nav-link">Kullanıcı</a>
+                    </li>
+                <% } %>
+            </ul>
+
+            <!-- Kullanıcı Erişim Kontrolleri -->
+            <ul class="navbar-nav ms-auto">
+                <% if (isAuth) { %>   
+                    <li class="nav-item">
+                        <a href="/blogs" class="nav-link"><%= fullname %></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/account/logout" class="nav-link">Çıkış</a>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a href="/account/login" class="nav-link">Giriş Yap</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/account/register" class="nav-link">Kayıt Ol</a>
+                    </li>
+                <% } %>               
+            </ul>
+        </div>
+    </div>
+</nav>

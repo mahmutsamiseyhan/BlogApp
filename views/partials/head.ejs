@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <!-- Meta Etiketleri -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS Dosyası -->
+    <link rel="stylesheet" href="/libs/bootstrap/dist/css/bootstrap.min.css">
+
+    <!-- Yeni Renk Paleti ve Tipografi -->
+    <style>
+        /* Genel Stil Ayarları */
+        body {
+            font-family: 'Roboto', sans-serif; /* Yazı tipi */
+            background-color: #f0f4f8; /* Arka plan rengi */
+            color: #333; /* Metin rengi */
+            line-height: 1.6; /* Satır yüksekliği */
+        }
+
+        /* Navbar Stilleri */
+        .navbar {
+            background-color: #0056b3; /* Navbar arka plan rengi */
+            padding: 10px 20px; /* İç boşluk */
+        }
+        .navbar .navbar-brand {
+            font-size: 24px; /* Marka yazı boyutu */
+            font-weight: bold; /* Marka yazı kalınlığı */
+        }
+        .navbar .nav-link {
+            font-size: 18px; /* Link yazı boyutu */
+            margin-right: 15px; /* Sağ boşluk */
+        }
+
+        /* Hero Bölgesi Stilleri */
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)) no-repeat center center; /* Arka plan resmi ve gradient */
+            background-size: cover; /* Arka planın kaplanma biçimi */
+            color: white; /* Metin rengi */
+            padding: 60px 20px; /* İç boşluk */
+            text-align: center; /* Metin hizalaması */
+        }
+
+        /* Blog Kartı Stilleri */
+        .blog-card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Gölge efekti */
+            border-radius: 8px; /* Köşe yuvarlama */
+            overflow: hidden; /* Taşmaları gizler */
+        }
+        .blog-card img {
+            border-top-left-radius: 8px; /* Sol üst köşe yuvarlama */
+            border-top-right-radius: 8px; /* Sağ üst köşe yuvarlama */
+        }
+        .blog-card .card-body {
+            padding: 20px; /* İç boşluk */
+        }
+        
+        /* Responsive Design */
+        @media only screen and (max-width: 768px) {
+            /* Mobil ekranlar için stil ayarları */
+            .navbar {
+                flex-direction: column; /* Navbar öğelerini dikey hizalar */
+                text-align: center; /* Metin hizalaması */
+            }
+            .hero-section {
+                padding: 30px 0; /* İç boşluk */
+            }
+            .col-md-3 {
+                display: none; /* Sol panel gizlenir */
+            }
+            .col-md-9 {
+                width: 100%; /* Sağ panel genişliği */
+            }
+            .blog-card {
+                margin-bottom: 15px; /* Blog kartı alt boşluk */
+            }
+        }
+
+        @media only screen and (min-width: 768px) and (max-width: 1024px) {
+            /* Tablet ekranlar için stil ayarları */
+            .navbar {
+                padding: 15px 0; /* İç boşluk */
+            }
+            .hero-section {
+                padding: 40px 0; /* İç boşluk */
+            }
+            .col-md-3 {
+                display: block; /* Sol panel görünür */
+                width: 25%; /* Sol panel genişliği */
+            }
+            .col-md-9 {
+                width: 75%; /* Sağ panel genişliği */
+            }
+            .blog-card {
+                margin-bottom: 20px; /* Blog kartı alt boşluk */
+            }
+        }
+
+        @media only screen and (min-width: 1024px) {
+            /* Masaüstü ekranlar için stil ayarları */
+            .hero-section {
+                padding: 50px 0; /* İç boşluk */
+            }
+            .col-md-3 {
+                display: block; /* Sol panel görünür */
+                width: 20%; /* Sol panel genişliği */
+            }
+            .col-md-9 {
+                width: 80%; /* Sağ panel genişliği */
+            }
+            .blog-card {
+                margin-bottom: 30px; /* Blog kartı alt boşluk */
+            }
+        }
+    </style>
+
+    <!-- Dinamik Sayfa Başlığı -->
+    <title><%= title %> - Blogapp</title>
+</head>
+<body>
+    <!-- Sayfanın içeriği buraya gelecek -->
+</body>
+</html>

@@ -1,0 +1,14 @@
+<div class="list-group">
+    <!-- Tüm Kategoriler Linki -->
+    <a href="/blogs" class="list-group-item list-group-item-action <%= !selectedCategory ? 'active' : '' %>"> 
+        Tüm Kategoriler 
+    </a>
+
+    <!-- Dinamik Kategori Linkleri -->
+    <% categories.forEach(function(category) { %>
+        <a href="/blogs/category/<%= category.url %>" 
+           class="list-group-item list-group-item-action <%= selectedCategory === category.url ? 'active' : '' %>">
+            <%= category.name %>  
+        </a>
+    <% }) %> 
+</div>

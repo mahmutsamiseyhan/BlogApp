@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <%- include("../partials/head") %>
+    <title>Rolü Sil</title>
+</head>
+<body>
+    <%- include("../partials/nav") %> 
+
+    <div class="container mt-3">
+        <h1>Rolü Sil</h1>
+        <p><strong><%= role.rolename %></strong> rolünü silmek istediğinizden emin misiniz?</p>
+        <!-- Silme işlemi için form -->
+        <form action="/admin/role/delete" method="POST">
+            <input type="hidden" name="roleId" value="<%= role._id %>"> <!-- Rol ID'si -->
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>"> <!-- CSRF Token -->
+            <button type="submit" class="btn btn-danger">Sil</button>
+            <a href="/admin/roles" class="btn btn-secondary">İptal</a>
+        </form>
+    </div>
+</body>
+</html>
