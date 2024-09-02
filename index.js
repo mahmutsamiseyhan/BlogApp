@@ -31,7 +31,6 @@ const errorHandling = require("./middlewares/error-handling");
 // EJS şablon motorunu ayarla
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));  // Views dizinini belirtmek için
-app.set('trust proxy', 1); // 1, en yaygın proxy seviyesini ifade eder.
 
 // URL-encoded ve JSON verilerini işle
 app.use(express.urlencoded({ extended: true }));
@@ -96,10 +95,20 @@ app.use((err, req, res, next) => {
 mongoose.connection.once('open', () => {
     console.log('MongoDB Atlas bağlantısı başarılı.');
 
-    // Sunucuyu başlat
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, function() {
-        console.log(`Server is running on port ${PORT}`);
+  // Diğer middleware ve ayarlar
+
+// Ortam değişkenlerine göre ayarlama yapın
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1); // Heroku için güvenilir proxy ayarı
+} else {
+    // Geliştirme ortamı için herhangi bir özel ayar
+}
+
+// Sunucu başlatma
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
 
         // Dummy verileri ekle
         populate().then(() => {
