@@ -238,7 +238,7 @@ exports.post_newpassword = async function(req, res) {
         }
 
         // Yeni şifreyi hash'ler ve kullanıcı kaydını günceller
-        user.password = password;
+        user.password = newPassword;
         user.resetToken = undefined; // Token'ı temizler
         user.resetTokenExpiration = undefined; // Token süresini temizler
 
