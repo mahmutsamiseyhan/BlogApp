@@ -39,7 +39,7 @@ exports.post_register = async function(req, res, next) {
         const newUser = new User({
             fullname: name,
             email: email,
-            password: await bcrypt.hash(password, 12) // Şifre hash'lenir ve kaydedilir
+            password: password // Şifre, 'pre' middleware'i ile otomatik olarak hashlenir
         });
 
         // Rolü bul ve kullanıcıya ata
@@ -234,7 +234,7 @@ exports.post_newpassword = async function(req, res) {
         }
 
         // Yeni şifreyi hash'ler ve kullanıcı kaydını günceller
-        user.password = await bcrypt.hash(newPassword, 12);
+        user.password = newPassword; // password alanını yeni şifre ile değiştirir
         user.resetToken = undefined; // Token'ı temizler
         user.resetTokenExpiration = undefined; // Token süresini temizler
 
