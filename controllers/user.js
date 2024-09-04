@@ -1,6 +1,6 @@
 // Gerekli modellerin içe aktarılması
-const Blog = require('../models/blog'); // Blog modeli
-const Category = require('../models/category'); // Kategori modeli
+const Blog = require('../models/blog'); // Blog modelini içe aktarır
+const Category = require('../models/category'); // Kategori modelini içe aktarır
 
 // Tüm blogları listeleyen fonksiyon
 exports.blog_list = async function(req, res) {
@@ -15,6 +15,9 @@ exports.blog_list = async function(req, res) {
             const category = await Category.findOne({ url: slug });
             if (category) {
                 query.categories = category._id; // Sorguya kategori filtresi ekleniyor
+            } else {
+                // Kategori bulunamazsa kullanıcıya bilgi verilmeden tüm bloglar listelenir
+                return res.status(404).render('error/404', { title: 'Kategori bulunamadı' });
             }
         }
 
@@ -37,13 +40,13 @@ exports.blog_list = async function(req, res) {
             blogs: blogs, // Blog listesi
             totalItems: totalItems, // Toplam blog sayısı
             totalPages: Math.ceil(totalItems / size), // Toplam sayfa sayısı
-            currentPage: page, // Mevcut sayfa numarası
+            currentPage: parseInt(page, 10), // Mevcut sayfa numarası (integer olarak)
             categories: categories, // Kategori listesi
             selectedCategory: slug // Seçili kategori slug'ı
         });
     }
     catch(err) {
-        console.log(err); // Hata konsola yazdırılır
+        console.error('Blog listesi yüklenirken hata oluştu:', err); // Hata konsola yazdırılır
         res.status(500).send('Bir hata oluştu'); // Hata durumunda hata mesajı gönderilir
     }
 };
@@ -62,11 +65,12 @@ exports.blogs_details = async function(req, res) {
                 blog: blog // Blog detayları
             });
         }
+
         // Blog bulunamazsa 404 hata sayfasını render eder
         res.status(404).render("error/404", { title: "Sayfa bulunamadı" });
     }
     catch(err) {
-        console.log(err); // Hata konsola yazdırılır
+        console.error('Blog detayları yüklenirken hata oluştu:', err); // Hata konsola yazdırılır
         res.status(500).send('Bir hata oluştu'); // Hata durumunda hata mesajı gönderilir
     }
 };
@@ -87,7 +91,7 @@ exports.index = async function(req, res) {
         });
     }
     catch(err) {
-        console.log(err); // Hata konsola yazdırılır
+        console.error('Ana sayfa yüklenirken hata oluştu:', err); // Hata konsola yazdırılır
         res.status(500).send('Bir hata oluştu'); // Hata durumunda hata mesajı gönderilir
     }
 };

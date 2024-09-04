@@ -1,12 +1,15 @@
+// 'express' modülünü yükler.
 const express = require('express');
-const verifyToken = require('../middlewares/verifyToken'); // Token doğrulama middleware'i
+// 'verifyToken' middleware'ini yükler. Bu middleware, JWT token doğrulaması yapar.
+const verifyToken = require('../middlewares/verifyToken');
 
+// Yeni bir Express router nesnesi oluşturur.
 const router = express.Router();
 
 // '/some-secure-route' URL'sine POST isteği yapıldığında, 'verifyToken' middleware'i çağrılır.
 // Bu middleware, token'ı doğrular ve geçerli ise işlemi gerçekleştirir.
 router.post('/some-secure-route', verifyToken, async (req, res) => {
-    // Güvenli işlem burada yapılır
+    // Güvenli işlem burada yapılır. Token doğrulandıktan sonra buraya ulaşılır.
     res.status(200).send({ message: "Access granted." });
 });
 

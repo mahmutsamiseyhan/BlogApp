@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 const Blog = require('../models/blog'); // Blog modelinizi doğru içe aktarın
 
-
 // Yardımcı işlevler ve middleware'leri yükler.
 const imageUpload = require("../helpers/image-upload"); // Görüntü yükleme işlemleri için yardımcı modül.
 const csrf = require("../middlewares/csrf"); // CSRF koruması için middleware.
@@ -57,6 +56,7 @@ router.post("/category/delete/:categoryid", isAdmin, adminController.post_catego
 
 router.post("/categories/remove", isAdmin, adminController.get_category_remove);
 // "/categories/remove" URL'sine POST isteği yapıldığında, birden fazla kategoriyi kaldırır ve 'get_category_remove' denetleyicisi çağrılır.
+
 // Blog ekleme route'u
 router.post('/blog/create', async (req, res, next) => {
     try {
@@ -71,6 +71,7 @@ router.post('/blog/create', async (req, res, next) => {
         res.render('admin/error', { message: 'Blog eklenirken bir hata oluştu.' });
     }
 });
+
 // Blog listesi route'u
 router.get('/blogs', async (req, res) => {
     try {
@@ -81,6 +82,7 @@ router.get('/blogs', async (req, res) => {
         res.render('admin/error', { message: 'Bloglar yüklenirken bir hata oluştu.' });
     }
 });
+
 // Rol rotaları
 router.get("/roles", isAdmin, adminController.get_roles);
 // "/roles" URL'sine GET isteği yapıldığında, admin yetkisi gerektirir ve 'get_roles' denetleyicisi çağrılır.
@@ -95,11 +97,9 @@ router.post("/roles/:roleid", isAdmin, adminController.post_role_edit);
 router.get('/user/delete/:userId', adminController.get_user_delete); // Onay sayfasını gösterir
 router.post('/user/delete', adminController.post_user_delete); // Silme işlemini gerçekleştirir
 
-
 // Rol Silme
 router.get('/role/delete/:roleId', adminController.get_role_delete); // Onay sayfasını gösterir
 router.post('/role/delete', adminController.post_role_delete); // Silme işlemini gerçekleştirir
-
 
 // Kullanıcı rotaları
 router.get("/users", isAdmin, adminController.get_user);

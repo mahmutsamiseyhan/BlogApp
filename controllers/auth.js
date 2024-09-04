@@ -1,13 +1,13 @@
 // Gerekli modüller ve yardımcı dosyalar dahil ediliyor
 const User = require("../models/user");
-const bcrypt = require("bcrypt"); // Şifreleme için kullanılıyor
+const bcrypt = require("bcrypt"); // Şifreleme işlemleri için kullanılır
 const sendMail = require("../helpers/send-mail"); // E-posta gönderme fonksiyonu
-const config = require("../config"); // Konfigürasyon dosyası
-const crypto = require("crypto"); // Kriptografik işlemler için kullanılıyor
-const jwt = require('jsonwebtoken'); // JSON Web Token oluşturma ve doğrulama
+const config = require("../config"); // Uygulama konfigürasyonları
+const crypto = require("crypto"); // Kriptografik işlemler için kullanılır
+const jwt = require('jsonwebtoken'); // JSON Web Token oluşturma ve doğrulama işlemleri
 const Role = require("../models/role"); // Rol modelini içe aktar
 
-// BASE_URL için ortam değişkeni ayarlanıyor
+// BASE_URL için ortam değişkeni ayarlanıyor, yoksa varsayılan değer kullanılıyor
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 // Kullanıcı kayıt sayfasını gösterir
@@ -15,18 +15,17 @@ exports.get_register = async function(req, res, next) {
     try {
         // Kayıt sayfasını render eder
         return res.render("auth/register", {
-            title: "register",
-            csrfToken: req.csrfToken() // CSRF token'ını şablona gönderir
+            title: "Kayıt Ol",
+            csrfToken: req.csrfToken() // CSRF koruması için token gönderilir
         });
+    } catch (err) {
+        next(err); // Hata durumunda sonraki middleware'e geçilir
     }
-    catch(err) {
-        next(err); // Hata işleme
-    }
-}
+};
 
 // Kullanıcı kayıt işlemini gerçekleştirir
 exports.post_register = async function(req, res, next) {
-    const { name, email, password, role } = req.body; 
+    const { name, email, password, role } = req.body; // Formdan gelen veriler
 
     try {
         // Kullanıcının zaten var olup olmadığını kontrol et
@@ -40,7 +39,7 @@ exports.post_register = async function(req, res, next) {
         const newUser = new User({
             fullname: name,
             email: email,
-            password: password // password hash'lenmiş olacak
+            password: await bcrypt.hash(password, 12) // Şifre hash'lenir ve kaydedilir
         });
 
         // Rolü bul ve kullanıcıya ata
@@ -66,7 +65,7 @@ exports.post_register = async function(req, res, next) {
                 msg += err.errors[e].message + " ";
             }
             return res.render("auth/register", {
-                title: "register",
+                title: "Kayıt Ol",
                 message: { text: msg, class: "danger" }
             });
         } else {
@@ -81,15 +80,14 @@ exports.get_login = async function(req, res, next) {
     delete req.session.message; // Mesajı oturumdan temizler
     try {
         return res.render("auth/login", {
-            title: "login",
+            title: "Giriş Yap",
             message: message, // Mesajı login sayfasına gönderir
             csrfToken: req.csrfToken() // CSRF koruması için token ekler
         });
-    }
-    catch(err) {
+    } catch (err) {
         next(err); // Hata işleme
     }
-}
+};
 
 // Kullanıcı giriş işlemini gerçekleştirir
 exports.post_login = async function(req, res, next) {
@@ -99,7 +97,7 @@ exports.post_login = async function(req, res, next) {
         const user = await User.findOne({ email: email }).populate('roles'); // Kullanıcıyı ve rollerini getir
         if (!user) {
             return res.render('auth/login', {
-                title: 'Login',
+                title: 'Giriş Yap',
                 message: { text: 'Email veya şifre hatalı', class: 'danger' },
                 csrfToken: req.csrfToken()
             });
@@ -109,15 +107,15 @@ exports.post_login = async function(req, res, next) {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.render('auth/login', {
-                title: 'Login',
+                title: 'Giriş Yap',
                 message: { text: 'Email veya şifre hatalı', class: 'danger' },
                 csrfToken: req.csrfToken()
             });
         }
 
         // Oturum bilgilerini ayarla
-        const userRoles = user.roles.map(role => role.rolename); // Kullanıcı rollerini çıkar
-        req.session.roles = userRoles; // ["admin", "moderator"]
+        const userRoles = user.roles.map(role => role.rolename); // Kullanıcı rollerini al
+        req.session.roles = userRoles; // Örneğin ["admin", "moderator"]
         req.session.isAuth = true;
         req.session.fullname = user.fullname;
         req.session.userid = user.id;
@@ -145,13 +143,13 @@ exports.get_reset = async function(req, res, next) {
     try {
         // Şifre sıfırlama sayfasını render eder
         return res.render("auth/reset-password", {
-            title: "reset-password",
+            title: "Şifre Sıfırla",
             csrfToken: req.csrfToken() // CSRF koruması için token ekler
         });
     } catch (err) {
         next(err); // Hata işleme
     }
-}
+};
 
 // Parola sıfırlama işlemini gerçekleştirir
 exports.post_reset = async function(req, res, next) {
@@ -159,7 +157,7 @@ exports.post_reset = async function(req, res, next) {
     try {
         const user = await User.findOne({ email: email }); // Kullanıcıyı e-posta adresine göre bulur
         if (!user) {
-            req.session.message = { text: "Eposta bulunamadı", class: "danger" }; // Kullanıcı bulunamazsa hata mesajı
+            req.session.message = { text: "E-posta adresi bulunamadı", class: "danger" }; // Kullanıcı bulunamazsa hata mesajı
             return res.redirect(`${BASE_URL}/account/reset-password`);
         }
 
@@ -177,10 +175,9 @@ exports.post_reset = async function(req, res, next) {
         );
 
         // Kullanıcıya bilgilendirme mesajı gösterir ve giriş sayfasına yönlendirir
-        req.session.message = { text: "Parolanızı sıfırlamak için eposta adresinizi kontrol ediniz.", class: "success"};
+        req.session.message = { text: "Parolanızı sıfırlamak için e-posta adresinizi kontrol ediniz.", class: "success"};
         res.redirect(`${BASE_URL}/account/login`);
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
         next(err); // Hata işleme
     }
@@ -205,13 +202,12 @@ exports.get_newpassword = async function(req, res, next) {
 
         // Yeni şifre belirleme sayfasını render eder
         return res.render("auth/new-password", {
-            title: "new password",
+            title: "Yeni Şifre",
             csrfToken: req.csrfToken(), // CSRF koruması için token ekler
             userId: user._id, // Kullanıcı ID'si
             token: token // Şifre sıfırlama token'ı
         });
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
         next(err); // Hata işleme
     }
@@ -238,7 +234,7 @@ exports.post_newpassword = async function(req, res) {
         }
 
         // Yeni şifreyi hash'ler ve kullanıcı kaydını günceller
-        user.password = newPassword;
+        user.password = await bcrypt.hash(newPassword, 12);
         user.resetToken = undefined; // Token'ı temizler
         user.resetTokenExpiration = undefined; // Token süresini temizler
 
@@ -247,8 +243,7 @@ exports.post_newpassword = async function(req, res) {
         // Kullanıcıya başarı mesajı gösterir ve giriş sayfasına yönlendirir
         req.session.message = { text: "Parolanız güncellendi", class: "success" };
         return res.redirect(`${BASE_URL}/account/login`);
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
         next(err); // Hata işleme
     }
@@ -263,4 +258,4 @@ exports.get_logout = function(req, res) {
         }
         res.redirect(`${BASE_URL}/account/login`); // Oturum başarıyla sonlandırılırsa giriş sayfasına yönlendirilir
     });
-}
+};

@@ -9,7 +9,7 @@ const blogSchema = new Schema({
     baslik: {
         type: String,                  // 'baslik' alanı bir dizedir.
         required: [true, 'Başlık zorunludur'], // 'baslik' alanının doldurulması zorunludur.
-        trim: true                     // Başlıktaki boşlukları otomatik olarak keser.
+        trim: true                     // Başlıktaki baştaki ve sondaki boşlukları otomatik olarak keser.
     },
     // 'url' alanı, blog yazısının benzersiz URL'sidir.
     url: {
@@ -22,7 +22,7 @@ const blogSchema = new Schema({
     // 'aciklama' alanı, blog yazısının açıklamasıdır.
     aciklama: String,                 // 'aciklama' alanı isteğe bağlı bir dizedir.
     // 'resim' alanı, blog yazısına ait resim URL'sidir.
-    resim: String,                     // 'resim' alanı isteğe bağlı bir dizedir.
+    resim: String,                    // 'resim' alanı isteğe bağlı bir dizedir.
     // 'anasayfa' alanı, blog yazısının anasayfada görünüp görünmeyeceğini belirler.
     anasayfa: {
         type: Boolean,                // 'anasayfa' alanı bir boolean (doğru/yanlış) değeridir.

@@ -7,7 +7,7 @@ const fs = require("fs");
 const slugField = require("../helpers/slugfield");
 
 // Blog silme sayfasını gösterir
-exports.get_blog_delete = async function(req, res){
+exports.get_blog_delete = async function(req, res) {
     // URL'den blog ID'sini ve oturumdan kullanıcı ID'sini alır
     const blogid = req.params.blogid;
     const userid = req.session.userid;
@@ -16,55 +16,52 @@ exports.get_blog_delete = async function(req, res){
     try {
         // Blog'u kullanıcı yetkilerine göre bulur
         const blog = await Blog.findOne(
-            isAdmin ? {_id: blogid} : {_id: blogid, userId: userid}
+            isAdmin ? { _id: blogid } : { _id: blogid, userId: userid }
         );
 
-        if(blog) {
+        if (blog) {
             // Blog bulunduysa, silme onay sayfasını gösterir
             return res.render("admin/blog-delete", {
-                title: "delete blog",
+                title: "Blog Sil",
                 blog: blog
             });
         }
         res.redirect("/admin/blogs"); // Blog bulunamazsa blog listesine yönlendirir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Blog silme işlemini gerçekleştirir
 exports.post_blog_delete = async function(req, res) {
     const blogid = req.body.blogid; // Formdan gelen blog ID'sini alır
     try {
         const blog = await Blog.findById(blogid); // Blog'u bulur
-        if(blog) {
+        if (blog) {
             await blog.remove(); // Blog bulunduysa silinir
             return res.redirect("/admin/blogs?action=delete"); // Silme işlemi sonrası yönlendirme yapılır
         }
         res.redirect("/admin/blogs"); // Blog bulunamazsa yönlendirir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Kategori silme sayfasını gösterir
-exports.get_category_delete = async function(req, res){
+exports.get_category_delete = async function(req, res) {
     const categoryid = req.params.categoryid; // URL'den kategori ID'sini alır
 
     try {
         const category = await Category.findById(categoryid); // Kategoriyi bulur
 
         res.render("admin/category-delete", {
-            title: "delete category",
+            title: "Kategori Sil",
             category: category
         }); // Silme sayfasını gösterir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Kategori silme işlemini gerçekleştirir
 exports.post_category_delete = async function(req, res) {
@@ -72,14 +69,12 @@ exports.post_category_delete = async function(req, res) {
     try {
         await Category.findByIdAndDelete(categoryid); // Kategoriyi siler
         res.redirect("/admin/categories?action=delete"); // Silme işlemi sonrası yönlendirme yapılır
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Yeni blog oluşturma sayfasını gösterir
-// Blog oluşturma sayfasını gösterir
 exports.get_blog_create = async function(req, res) {
     try {
         const categories = await Category.find(); // Kategorileri veritabanından al
@@ -87,7 +82,7 @@ exports.get_blog_create = async function(req, res) {
             title: "Yeni Blog Oluştur",
             categories: categories,
             values: req.body || {}, // `values` değişkenini `req.body` ile doldur veya boş bir obje gönder
-            csrfToken: req.csrfToken()
+            csrfToken: req.csrfToken() // CSRF koruması için token
         });
     } catch (err) {
         console.log("Kategori alınırken hata oluştu:", err);
@@ -96,20 +91,19 @@ exports.get_blog_create = async function(req, res) {
 };
 
 // Yeni blog oluşturma işlemini gerçekleştirir
-// Blog oluşturma işlemi
 exports.post_blog_create = async function(req, res) {
     const baslik = req.body.baslik;
     const altbaslik = req.body.altbaslik;
     const aciklama = req.body.aciklama;
-    const anasayfa = req.body.anasayfa == "on" ? true : false;
-    const onay = req.body.onay == "on" ? true : false;
+    const anasayfa = req.body.anasayfa === "on"; // Anasayfa durumu
+    const onay = req.body.onay === "on"; // Onay durumu
     const categories = req.body.categories || []; // Seçilen kategorileri alır
     const userid = req.session.userid;
     let resim = "";
 
     try {
         // Başlık ve açıklama doğrulama işlemleri
-        if (baslik == "") {
+        if (!baslik) {
             throw new Error("Başlık boş geçilemez");
         }
 
@@ -117,7 +111,7 @@ exports.post_blog_create = async function(req, res) {
             throw new Error("Başlık 5-20 karakter aralığında olmalıdır.");
         }
 
-        if (aciklama == "") {
+        if (!aciklama) {
             throw new Error("Açıklama boş geçilemez");
         }
 
@@ -125,7 +119,7 @@ exports.post_blog_create = async function(req, res) {
         if (req.file) {
             resim = req.file.filename;
 
-            fs.unlink("./public/images/" + req.body.resim, err => {
+            fs.unlink(`./public/images/${req.body.resim}`, err => {
                 if (err) {
                     console.log("Eski resim silinirken hata oluştu:", err);
                 }
@@ -147,24 +141,15 @@ exports.post_blog_create = async function(req, res) {
 
         res.redirect("/admin/blogs?action=create"); // Blog oluşturulduktan sonra yönlendirme yapılır
     } catch (err) {
-        let hataMesaji = "";
+        let hataMesaji = err.message || "Bir hata oluştu.";
 
-        if (err instanceof Error) {
-            hataMesaji += err.message;
-
-            // Hata durumunda hata mesajı ve kullanıcı girdileri ile sayfayı yeniden gösterir
-            res.render("admin/blog-create", {
-                title: "add blog",
-                categories: await Category.find(),
-                message: { text: hataMesaji, class: "danger" },
-                values: {
-                    baslik: baslik,
-                    altbaslik: altbaslik,
-                    aciklama: aciklama,
-                    categories: categories // Seçili kategorileri korur
-                }
-            });
-        }
+        // Hata durumunda hata mesajı ve kullanıcı girdileri ile sayfayı yeniden gösterir
+        res.render("admin/blog-create", {
+            title: "Yeni Blog Ekle",
+            categories: await Category.find(),
+            message: { text: hataMesaji, class: "danger" },
+            values: { baslik, altbaslik, aciklama, categories }
+        });
     }
 };
 
@@ -172,18 +157,16 @@ exports.post_blog_create = async function(req, res) {
 exports.get_category_create = async function(req, res) {
     try {
         res.render("admin/category-create", {
-            title: "add category"
+            title: "Yeni Kategori Ekle"
         }); // Kategori oluşturma sayfasını gösterir
-    }
-    catch(err) {
+    } catch (err) {
+        console.log("Kategori oluşturma sayfası açılırken hata oluştu:", err);
         res.redirect("/500"); // Hata durumunda hata sayfasına yönlendirir
     }
-}
+};
 
 // Yeni kategori oluşturma işlemini gerçekleştirir
-
-// Kategori oluşturma işlemi
-exports.post_category_create = async function(req, res, next) {
+exports.post_category_create = async function(req, res) {
     try {
         const { name } = req.body; // İstekten gelen kategori adı
         const url = slugField(name); // Kategorinin URL'si için slug oluştur
@@ -204,21 +187,21 @@ exports.post_category_create = async function(req, res, next) {
         res.redirect("/admin/category/create");
     }
 };
+
 // Blog düzenleme sayfasını gösterir
 exports.get_blog_edit = async function(req, res) {
     const blogid = req.params.blogid; // URL'den blog ID'sini alır
     const userid = req.session.userid;
-
     const isAdmin = req.session.roles.includes("admin"); // Kullanıcının admin olup olmadığını kontrol eder
 
     try {
         const blog = await Blog.findOne(
-            isAdmin ? {_id: blogid} : {_id: blogid, userId: userid}
+            isAdmin ? { _id: blogid } : { _id: blogid, userId: userid }
         ).populate('categories'); // Blog'u kategorileriyle birlikte bulur
 
         const categories = await Category.find(); // Tüm kategorileri getirir
 
-        if(blog) {
+        if (blog) {
             return res.render("admin/blog-edit", {
                 title: blog.baslik,
                 blog: blog,
@@ -227,11 +210,10 @@ exports.get_blog_edit = async function(req, res) {
         }
 
         res.redirect("/admin/blogs"); // Blog bulunamazsa blog listesine yönlendirir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Blog düzenleme işlemini gerçekleştirir
 exports.post_blog_edit = async function(req, res) {
@@ -246,24 +228,25 @@ exports.post_blog_edit = async function(req, res) {
 
     let resim = req.body.resim;
 
-    if(req.file) {
+    // Eğer yeni bir resim yüklenmişse, eski resmi sil ve yeni resmi kaydet
+    if (req.file) {
         resim = req.file.filename;
 
-        fs.unlink("./public/images/" + req.body.resim, err => {
+        fs.unlink(`./public/images/${req.body.resim}`, err => {
             console.log(err);
         });
     }
 
-    const anasayfa = req.body.anasayfa == "on" ? true : false;
-    const onay = req.body.onay == "on" ? true : false;
+    const anasayfa = req.body.anasayfa === "on"; // Anasayfa durumu
+    const onay = req.body.onay === "on"; // Onay durumu
     const isAdmin = req.session.roles.includes("admin");
 
     try {
         const blog = await Blog.findOne(
-            isAdmin ? {_id: blogid} : {_id: blogid, userId: userid}
+            isAdmin ? { _id: blogid } : { _id: blogid, userId: userid }
         );
 
-        if(blog) {
+        if (blog) {
             // Blog bilgilerini günceller
             blog.baslik = baslik;
             blog.altbaslik = altbaslik;
@@ -272,22 +255,17 @@ exports.post_blog_edit = async function(req, res) {
             blog.anasayfa = anasayfa;
             blog.onay = onay;
             blog.url = url;
-            
-            if(kategoriIds == undefined) {
-                blog.categories = [];
-            } else {
-                blog.categories = kategoriIds;
-            }
+
+            blog.categories = kategoriIds || []; // Seçili kategorileri günceller, yoksa boş bırakır
 
             await blog.save(); // Blogu kaydeder
-            return res.redirect("/admin/blogs?action=edit&blogid=" + blogid); // Düzenleme sonrası yönlendirme yapılır
+            return res.redirect(`/admin/blogs?action=edit&blogid=${blogid}`); // Düzenleme sonrası yönlendirme yapılır
         }
         res.redirect("/admin/blogs"); // Blog bulunamazsa yönlendirme yapılır
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Belirli bir kategoriyi bir blogdan kaldırır
 exports.get_category_remove = async function(req, res) {
@@ -298,11 +276,11 @@ exports.get_category_remove = async function(req, res) {
         await Blog.findByIdAndUpdate(blogid, {
             $pull: { categories: categoryid }
         }); // Blogdan kategoriyi çıkarır
-        res.redirect("/admin/categories/" + categoryid); // Yönlendirme yapılır
-    } catch(err) {
+        res.redirect(`/admin/categories/${categoryid}`); // Yönlendirme yapılır
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Kategori düzenleme sayfasını gösterir
 exports.get_category_edit = async function(req, res) {
@@ -310,10 +288,10 @@ exports.get_category_edit = async function(req, res) {
 
     try {
         const category = await Category.findById(categoryid); // Kategoriyi bulur
-        const blogs = await Blog.find({categories: categoryid}); // Bu kategoriye ait blogları bulur
+        const blogs = await Blog.find({ categories: categoryid }); // Bu kategoriye ait blogları bulur
         const countBlog = blogs.length; // Blog sayısını hesaplar
 
-        if(category) {
+        if (category) {
             return res.render("admin/category-edit", {
                 title: category.name,
                 category: category,
@@ -322,12 +300,11 @@ exports.get_category_edit = async function(req, res) {
             }); // Kategori düzenleme sayfasını gösterir
         }
 
-        res.redirect("admin/categories"); // Kategori bulunamazsa yönlendirme yapılır
-    }
-    catch(err) {
+        res.redirect("/admin/categories"); // Kategori bulunamazsa yönlendirme yapılır
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Kategori düzenleme işlemini gerçekleştirir
 exports.post_category_edit = async function(req, res) {
@@ -338,12 +315,11 @@ exports.post_category_edit = async function(req, res) {
         await Category.findByIdAndUpdate(categoryid, {
             name: name
         }); // Kategoriyi günceller
-        return res.redirect("/admin/categories?action=edit&categoryid=" + categoryid); // Düzenleme sonrası yönlendirme yapılır
-    }    
-    catch(err) {
+        return res.redirect(`/admin/categories?action=edit&categoryid=${categoryid}`); // Düzenleme sonrası yönlendirme yapılır
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Blog listesini gösterir
 exports.get_blogs = async function(req, res) {
@@ -357,19 +333,20 @@ exports.get_blogs = async function(req, res) {
             query.userId = userid; // Eğer kullanıcı moderator ise ve admin değilse sadece kendi bloglarını gösterir
         }
 
-        const blogs = await Blog.find(query).select('id baslik altbaslik resim').populate('categories', 'name'); // Blogları getirir
-        
+        const blogs = await Blog.find(query)
+            .select('id baslik altbaslik resim')
+            .populate('categories', 'name'); // Blogları getirir ve ilgili kategorileri ilişkilendirir
+
         res.render("admin/blog-list", {
-            title: "blog list",
+            title: "Blog Listesi",
             blogs: blogs,
             action: req.query.action,
             blogid: req.query.blogid
         }); // Blog listesi sayfasını gösterir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Kategori listesini gösterir
 exports.get_categories = async function(req, res) {
@@ -377,16 +354,15 @@ exports.get_categories = async function(req, res) {
         const categories = await Category.find(); // Tüm kategorileri getirir
 
         res.render("admin/category-list", {
-            title: "blog list",
+            title: "Kategori Listesi",
             categories: categories,
             action: req.query.action,
             categoryid: req.query.categoryid
         }); // Kategori listesi sayfasını gösterir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Rol listesini gösterir
 exports.get_roles = async function(req, res) {
@@ -410,22 +386,21 @@ exports.get_roles = async function(req, res) {
         ]);
 
         res.render("admin/role-list", {
-            title: "role list",
+            title: "Rol Listesi",
             roles: roles
         });// Rol listesi sayfasını gösterir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Rol düzenleme sayfasını gösterir
 exports.get_role_edit = async function(req, res) {
     const roleid = req.params.roleid; // URL'den rol ID'sini alır
     try {
         const role = await Role.findById(roleid); // Rolü bulur
-        const users = await User.find({roles: roleid}); // Bu role sahip kullanıcıları bulur
-        if(role) {
+        const users = await User.find({ roles: roleid }); // Bu role sahip kullanıcıları bulur
+        if (role) {
             return res.render("admin/role-edit", {
                 title: role.rolename,
                 role: role,
@@ -434,11 +409,10 @@ exports.get_role_edit = async function(req, res) {
         }
 
         res.redirect("admin/roles"); // Rol bulunamazsa yönlendirme yapılır
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Rol düzenleme işlemini gerçekleştirir
 exports.post_role_edit = async function(req, res) {
@@ -449,11 +423,11 @@ exports.post_role_edit = async function(req, res) {
             rolename: rolename
         }); // Rolü günceller
         return res.redirect("/admin/roles"); // Düzenleme sonrası yönlendirme yapılır
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
+
 // Rol silme onay sayfasını gösterir
 exports.get_role_delete = async function(req, res) {
     const roleId = req.params.roleId; // URL'den rol ID'sini alır
@@ -473,7 +447,7 @@ exports.get_role_delete = async function(req, res) {
         console.log(err); // Hata konsola yazdırılır
         res.redirect("/admin/roles");
     }
-}
+};
 
 // Rol silme işlemini gerçekleştirir
 exports.post_role_delete = async function(req, res) {
@@ -490,15 +464,15 @@ exports.post_role_delete = async function(req, res) {
         console.log(err); // Hata konsola yazdırılır
         res.redirect("/admin/roles");
     }
-}
+};
 
 // Kullanıcı silme onay sayfasını gösterir
-exports.get_user_delete = async function(req, res){
+exports.get_user_delete = async function(req, res) {
     const userId = req.params.userId; // URL'den kullanıcı ID'sini alır
 
     try {
         const user = await User.findById(userId); // Kullanıcıyı bulur
-        if(user) {
+        if (user) {
             // Kullanıcı bulunduysa, silme onay sayfasını gösterir
             return res.render("admin/user-delete", {
                 title: "Kullanıcıyı Sil",
@@ -507,13 +481,11 @@ exports.get_user_delete = async function(req, res){
             });
         }
         res.redirect("/admin/users"); // Kullanıcı bulunamazsa kullanıcı listesine yönlendirir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
         res.redirect("/admin/users");
     }
-}
-
+};
 
 // Kullanıcı silme işlemini gerçekleştirir
 exports.post_user_delete = async function(req, res) {
@@ -521,54 +493,52 @@ exports.post_user_delete = async function(req, res) {
 
     try {
         const user = await User.findById(userId); // Kullanıcıyı bulur
-        if(user) {
+        if (user) {
             await user.remove(); // Kullanıcı bulunduysa silinir
             return res.redirect("/admin/users?action=delete"); // Silme işlemi sonrası yönlendirme yapılır
         }
         res.redirect("/admin/users"); // Kullanıcı bulunamazsa yönlendirir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
         res.redirect("/admin/users");
     }
-}
-
+};
 
 // Kullanıcı listesini gösterir
-exports.get_user = async function(req,res) {
+exports.get_user = async function(req, res) {
     try {
-        const users = await User.find().select('id fullname email').populate('roles', 'rolename'); // Kullanıcıları getirir ve rollerini dahil eder
+        const users = await User.find()
+            .select('id fullname email')
+            .populate('roles', 'rolename'); // Kullanıcıları getirir ve rollerini dahil eder
 
         res.render("admin/user-list", {
-            title: "user list",
+            title: "Kullanıcı Listesi",
             users: users
         }); // Kullanıcı listesi sayfasını gösterir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Kullanıcı düzenleme sayfasını gösterir
-exports.get_user_edit = async function(req,res) {
+exports.get_user_edit = async function(req, res) {
     const userid = req.params.userid; // URL'den kullanıcı ID'sini alır
     try {
         const user = await User.findById(userid).populate('roles'); // Kullanıcıyı roller ile birlikte bulur
         const roles = await Role.find(); // Tüm rolleri getirir
 
         res.render("admin/user-edit", {
-            title: "user edit",
+            title: "Kullanıcıyı Düzenle",
             user: user,
             roles: roles
         }); // Kullanıcı düzenleme sayfasını gösterir
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};
 
 // Kullanıcı düzenleme işlemini gerçekleştirir
-exports.post_user_edit = async function(req,res) {
+exports.post_user_edit = async function(req, res) {
     const userid = req.body.userid; // Formdan kullanıcı ID'sini alır
     const fullname = req.body.fullname; // Formdan tam adını alır
     const email = req.body.email; // Formdan e-posta adresini alır
@@ -577,7 +547,7 @@ exports.post_user_edit = async function(req,res) {
     try {
         const user = await User.findById(userid); // Kullanıcıyı bulur
 
-        if(user) {
+        if (user) {
             // Kullanıcı bilgilerini günceller
             user.fullname = fullname;
             user.email = email;
@@ -587,8 +557,7 @@ exports.post_user_edit = async function(req,res) {
             return res.redirect("/admin/users"); // Düzenleme sonrası yönlendirme yapılır
         }
         return res.redirect("/admin/users"); // Kullanıcı bulunamazsa yönlendirme yapılır
-    }
-    catch(err) {
+    } catch (err) {
         console.log(err); // Hata konsola yazdırılır
     }
-}
+};

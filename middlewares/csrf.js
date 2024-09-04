@@ -1,7 +1,6 @@
-// Middleware işlevini tanımlar ve dışa aktarır.
-// Bu middleware, CSRF token'ını her istek için yerel değişkenlere ekler.
+// CSRF koruması için gerekli modüller ve middleware işlevini tanımlar.
 const csrf = require('csurf');
-const csrfProtection = csrf({ cookie: true }); // CSRF korumasını etkinleştirir
+const csrfProtection = csrf({ cookie: true }); // CSRF korumasını etkinleştirir, token'ı çerezlerde saklar
 
 module.exports = (req, res, next) => {
     // Eğer 'req.csrfToken' fonksiyonu mevcutsa, CSRF token'ını oluşturur ve 'res.locals' içinde saklar.
@@ -10,9 +9,9 @@ module.exports = (req, res, next) => {
         // Token, şablonlarda kullanılmak üzere 'res.locals.csrfToken' içinde saklanır.
         res.locals.csrfToken = req.csrfToken();
     } else {
-        // 'req.csrfToken' fonksiyonu mevcut değilse, konsola hata mesajı yazdırır.
+        // 'req.csrfToken' fonksiyonu mevcut değilse, bu durumu konsola hata mesajı olarak yazdırır.
         console.error('CSRF token function is not available');
     }
     // Bir sonraki middleware işlevine geçiş yapar.
     next();
-}
+};
