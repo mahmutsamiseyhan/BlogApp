@@ -2,9 +2,9 @@
 const express = require("express");
 // Yeni bir Express router nesnesi oluşturur
 const router = express.Router();
-
 // User controller'ını dahil et
 const userController = require("../controllers/user");
+
 
 // Belirli bir kategoriye ait blog yazılarını listeleme endpoint'i
 // URL: /blogs/category/:slug

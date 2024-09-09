@@ -13,14 +13,23 @@
     <!-- Yeni Renk Paleti ve Tipografi -->
     <style>
         /* Genel Stil Ayarları */
+        :root {
+      --bs-body-bg: #ffffff;
+      --bs-body-color: #000000;
+    }
+
+    .dark-mode {
+      --bs-body-bg: #103358;
+      --bs-body-color: #000000;
+    }
+        /* Genel Stil Ayarları */
         body {
             font-family: 'Dancing Script', cursive; /* Yazı tipi */
-            background-color: #f0f4f8; /* Arka plan rengi */
-            color: #000000; /* Metin rengi */
+            background-color: var(--bs-body-bg);/* Arka plan rengi */
+            color: var(--bs-body-color); /* Metin rengi */
             line-height: 1.6; /* Satır yüksekliği */
             font-size: 1.125rem
         }
-
         /* Navbar Stilleri */
         .navbar {
             background-color: #103358; /* Navbar arka plan rengi */
@@ -33,6 +42,10 @@
         .navbar .nav-link {
             font-size: 18px; /* Link yazı boyutu */
             margin-right: 15px; /* Sağ boşluk */
+        }
+        .btn-primary {
+            background-color: #103358; /* Buton arka plan rengi */
+            border-color: #103358; /* Buton kenarlık rengi */
         }
 
         /* Hero Bölgesi Stilleri */

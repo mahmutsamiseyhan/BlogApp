@@ -30,7 +30,6 @@ const populate = require("./data/dummy-data");  // Dummy verileri eklemek için 
 const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
-
 // Orta katman (middleware) işlevlerini dahil et
 const locals = require("./middlewares/locals");
 const logMiddleware = require("./middlewares/log");

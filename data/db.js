@@ -23,6 +23,7 @@ async function connect() {
     }
 }
 
+
 // Tanımlanan `connect` fonksiyonu çağrılır
 connect();
 
