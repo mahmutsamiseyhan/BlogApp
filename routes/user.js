@@ -24,12 +24,12 @@ router.get("/blogs/:slug", userController.blogs_details);
 // Bu endpoint, veritabanındaki tüm blogları listeler
 router.get("/blogs", userController.blog_list);
 
-// Blogları listeleme ve filtreleme
-// Blogları listeleme ve filtreleme
-// Blogları listeleme ve filtreleme
+// Blogları listeleme, filtreleme ve sıralama
 router.get("/blogs", async (req, res) => {
     const query = req.query.search || ''; // Arama sorgusu
     const selectedCategory = req.query.category || ''; // Seçilen kategori
+    const sort = req.query.sort || 'createdAt'; // Sıralama kriteri
+    const order = req.query.order === 'asc' ? 1 : -1; // Sıralama yönü: asc veya desc
 
     let filter = {}; // Blogları filtrelemek için kullanılacak obje
 
@@ -44,8 +44,12 @@ router.get("/blogs", async (req, res) => {
     }
 
     try {
-        // Blogları çek ve kategorilerle populate et
-        const blogs = await Blog.find(filter).populate('categories').exec();
+        // Blogları çek ve kategorilerle populate et, aynı zamanda sıralama yap
+        const blogs = await Blog.find(filter)
+            .populate('categories')
+            .sort({ [sort]: order })
+            .exec();
+
         // Mevcut kategorileri çek
         const categories = await Category.find({}).exec();
 
@@ -55,6 +59,8 @@ router.get("/blogs", async (req, res) => {
             categories, 
             query, 
             selectedCategory,
+            sort,
+            order,
             title: 'Blog Listesi'
         });
     } catch (err) {
