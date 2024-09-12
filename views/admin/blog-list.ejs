@@ -27,6 +27,11 @@
                     </div>
                 <% } %>
 
+                <!-- Arama Kutusu -->
+                <div class="search-container mb-3">
+                    <input type="text" id="blogSearch" placeholder="Blog ara..." class="form-control">
+                </div>
+
                 <!-- Bloglar Tablosu -->
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -38,14 +43,14 @@
                             <th style="width: 130px;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="blogTableBody">
                         <% blogs.forEach(blog => { %>
                             <tr>
                                 <td>#<%= blog._id %></td> <!-- Blog'un ID'sine erişim -->
                                 <td>
                                     <img src="/static/images/<%= blog.resim %>" class="img-fluid" alt="">
                                 </td>
-                                <td>
+                                <td class="blog-title">
                                     <%= blog.baslik %> <!-- Blog başlığına erişim -->
                                 </td>
                                 <td>
@@ -68,5 +73,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Blog Filtreleme JavaScript -->
+    <script>
+        document.getElementById('blogSearch').addEventListener('input', function() {
+            const searchQuery = this.value.toLowerCase();
+            const blogRows = document.querySelectorAll('#blogTableBody tr');
+
+            blogRows.forEach(function(row) {
+                const title = row.querySelector('.blog-title').textContent.toLowerCase();
+                if (title.includes(searchQuery)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>

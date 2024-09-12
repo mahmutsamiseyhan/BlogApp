@@ -24,14 +24,21 @@
             <div class="col-md-9">
                 <h1 class="h3 mb-3" data-aos="fade-right"><%= title %></h1>
 
+                <!-- Arama Kutusu -->
+                <div class="search-container mb-3">
+                    <input type="text" id="blogSearch" placeholder="Blog ara..." class="form-control">
+                </div>
+
                 <% if (blogs.length === 0) { %>
                     <p data-aos="fade-in">Gösterilecek blog bulunamadı.</p>
                 <% } else { %>
-                    <% blogs.forEach(blog => { %>
-                        <div data-aos="fade-up">
-                            <%- include("../partials/blog-card", blog) %> 
-                        </div>
-                    <% }) %>
+                    <div id="blogList">
+                        <% blogs.forEach(blog => { %>
+                            <div data-aos="fade-up" class="blog-card">
+                                <%- include("../partials/blog-card", blog) %> 
+                            </div>
+                        <% }) %>
+                    </div>
                 <% } %>
             </div>
         </div>
@@ -44,13 +51,32 @@
         once: true
       });
     </script>
-   <script>
-    const toggleButton = document.getElementById('theme-toggle');
-    toggleButton.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-    });
-  </script>
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const toggleButton = document.getElementById('theme-toggle');
+        toggleButton.addEventListener('click', () => {
+          document.body.classList.toggle('dark-mode');
+        });
+    </script>
+
+    <!-- Blog Filtreleme JavaScript -->
+    <script>
+        document.getElementById('blogSearch').addEventListener('input', function() {
+            const searchQuery = this.value.toLowerCase();
+            const blogCards = document.querySelectorAll('#blogList .blog-card');
+
+            blogCards.forEach(function(card) {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                if (title.includes(searchQuery)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
