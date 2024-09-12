@@ -11,25 +11,9 @@
         <div class="row">
             <!-- Kategori Menü Alanı -->
             <div class="col-md-3">
-                <form action="/blogs" method="GET">
-                    <input type="text" name="search" placeholder="Bloglarda ara..." value="<%= typeof query !== 'undefined' ? query : '' %>" class="form-control mb-2">
-                    <select name="category" class="form-control mb-2">
-                        <option value="">Tüm Kategoriler</option>
-                        <% categories.forEach(category => { %>
-                            <option value="<%= category._id %>" <%= typeof selectedCategory !== 'undefined' && selectedCategory.toString() === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
-                        <% }) %>
-                    </select>
-                    <select name="sort" class="form-control mb-2">
-                        <option value="createdAt" <%= sort === 'createdAt' ? 'selected' : '' %>>Tarih</option>
-                        <option value="baslik" <%= sort === 'baslik' ? 'selected' : '' %>>Başlık</option>
-                    </select>
-                    <select name="order" class="form-control mb-2">
-                        <option value="asc" <%= order === 1 ? 'selected' : '' %>>Artan</option>
-                        <option value="desc" <%= order === -1 ? 'selected' : '' %>>Azalan</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary">Ara</button>
-                </form>
+                <%- include("../partials/category-menu", { categories, selectedCategory }) %> 
             </div>
+
             <!-- Blog Listesi ve İçerik Alanı -->
             <div class="col-md-9">
                 <h1 class="h3 mb-3"><%= title %></h1>
