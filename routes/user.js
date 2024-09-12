@@ -5,6 +5,7 @@ const router = express.Router();
 // User controller'ını dahil et
 const userController = require("../controllers/user");
 
+const Category = require("../models/category");
 
 // Belirli bir kategoriye ait blog yazılarını listeleme endpoint'i
 // URL: /blogs/category/:slug
@@ -25,9 +26,10 @@ router.get("/blogs", userController.blog_list);
 
 // Blogları listeleme ve filtreleme
 // Blogları listeleme ve filtreleme
+// Blogları listeleme ve filtreleme
 router.get("/blogs", async (req, res) => {
-    const query = req.query.search || ''; // Arama sorgusu (boş olabilir)
-    const selectedCategory = req.query.category || ''; // Seçilen kategori (boş olabilir)
+    const query = req.query.search || ''; // Arama sorgusu
+    const selectedCategory = req.query.category || ''; // Seçilen kategori
 
     let filter = {}; // Blogları filtrelemek için kullanılacak obje
 
@@ -36,14 +38,16 @@ router.get("/blogs", async (req, res) => {
     }
 
     if (selectedCategory) {
-        filter.categories = selectedCategory; // Kategoriye göre filtreleme
+        // Seçilen kategoriye göre blogları filtrele
+        const category = await Category.findOne({ _id: selectedCategory }).populate('blogs').exec();
+        filter._id = { $in: category.blogs.map(blog => blog._id) }; // Kategoriye ait blogların ID'lerini filtrele
     }
 
     try {
         // Blogları çek ve kategorilerle populate et
         const blogs = await Blog.find(filter).populate('categories').exec();
         // Mevcut kategorileri çek
-        const categories = await Blog.distinct('categories');
+        const categories = await Category.find({}).exec();
 
         // Sayfayı render et
         res.render('users/blogs', { 
