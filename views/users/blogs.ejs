@@ -11,7 +11,16 @@
         <div class="row">
             <!-- Kategori Menü Alanı -->
             <div class="col-md-3">
-                <%- include("../partials/category-menu", { categories, selectedCategory }) %> 
+                <form action="/blogs" method="GET">
+                    <input type="text" name="search" placeholder="Bloglarda ara..." value="<%= typeof query !== 'undefined' ? query : '' %>" class="form-control mb-2">
+                    <select name="category" class="form-control mb-2">
+                        <option value="">Tüm Kategoriler</option>
+                        <% categories.forEach(category => { %>
+                            <option value="<%= category._id %>" <%= typeof selectedCategory !== 'undefined' && selectedCategory.toString() === category._id.toString() ? 'selected' : '' %>><%= category.name %></option>
+                        <% }) %>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Ara</button>
+                </form>
             </div>
 
             <!-- Blog Listesi ve İçerik Alanı -->

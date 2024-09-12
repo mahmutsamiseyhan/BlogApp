@@ -23,6 +23,41 @@ router.get("/blogs/:slug", userController.blogs_details);
 // Bu endpoint, veritabanındaki tüm blogları listeler
 router.get("/blogs", userController.blog_list);
 
+// Blogları listeleme ve filtreleme
+// Blogları listeleme ve filtreleme
+router.get("/blogs", async (req, res) => {
+    const query = req.query.search || ''; // Arama sorgusu (boş olabilir)
+    const selectedCategory = req.query.category || ''; // Seçilen kategori (boş olabilir)
+
+    let filter = {}; // Blogları filtrelemek için kullanılacak obje
+
+    if (query) {
+        filter.baslik = { $regex: query, $options: 'i' }; // Başlıkta arama (case-insensitive)
+    }
+
+    if (selectedCategory) {
+        filter.categories = selectedCategory; // Kategoriye göre filtreleme
+    }
+
+    try {
+        // Blogları çek ve kategorilerle populate et
+        const blogs = await Blog.find(filter).populate('categories').exec();
+        // Mevcut kategorileri çek
+        const categories = await Blog.distinct('categories');
+
+        // Sayfayı render et
+        res.render('users/blogs', { 
+            blogs, 
+            categories, 
+            query, 
+            selectedCategory,
+            title: 'Blog Listesi'
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
 // Ana sayfa endpoint'i
 // URL: /
 // Bu endpoint, uygulamanın ana sayfasını render eder
