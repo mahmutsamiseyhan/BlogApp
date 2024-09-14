@@ -74,3 +74,8 @@ Bu proje, kullanıcılara blog yazılarını paylaşabilecekleri, diğer kullan�
     ```
 - **Güvenlik**: 
     - `.env` dosyasının güvenliği sağlanmalı ve asla GitHub'da yayınlanmamalıdır.
+ ## Projeyi Canlı Olarak Görüntüleyin
+
+Projeyi canlı olarak görmek için aşağıdaki linke tıklayın:
+
+[BlogApp Canlı Uygulama](https://blog-app1-0a08a34f581f.herokuapp.com/account/login)
