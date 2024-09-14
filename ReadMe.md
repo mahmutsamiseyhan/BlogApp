@@ -82,7 +82,7 @@ Bu proje, kullanıcılara blog yazılarını paylaşabilecekleri, diğer kullan�
 ## Ana Sayfa (Aydınlık Mod)
 ![Ekran görüntüsü 2024-09-14 160712](https://github.com/user-attachments/assets/e941534e-5b41-47a4-960b-cd6af6730c0a)
 ## Ana Sayfa (Karanlık Mod)
-![Ekran görüntüsü 2024-09-14 160746](https://github.com/user-attachments/assets/8cbb293b-807f-4b54-bc1c-6c221de2f855)
+![Ekran görüntüsü 2024-09-14 162929](https://github.com/user-attachments/assets/967a6c4d-42c4-49c2-a349-a87855d3485f)
 ## Tüm Bloglar
 ![Ekran görüntüsü 2024-09-14 160819](https://github.com/user-attachments/assets/1613d6be-5865-4f92-a570-6f0ec0e7ce1e)
 ![Ekran görüntüsü 2024-09-14 160845](https://github.com/user-attachments/assets/53b583db-3786-40e9-93f1-ab80b9d29633)
